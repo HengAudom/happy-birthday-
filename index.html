@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Happy Birthday My Love</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:#07000d;
+  min-height:100vh;
+  font-family:'Cormorant Garamond',serif;
+  overflow-x:hidden;
+  overflow-y:auto;
+  position:relative;
+  display:block;
+}
+
+#canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* ── Falling items ── */
+#fallers{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  overflow:hidden;
+}
+.faller{
+  position:absolute;
+  top:-80px;
+  opacity:0;
+  animation:fallDown linear infinite;
+  filter:drop-shadow(0 0 8px rgba(255,100,160,.7));
+}
+@keyframes fallDown{
+  0%  {opacity:0;transform:translateY(0) rotate(-15deg) scale(1);}
+  6%  {opacity:1;}
+  88% {opacity:.95;}
+  100%{opacity:0;transform:translateY(108vh) rotate(340deg) scale(.6);}
+}
+
+/* ── Glow bg ── */
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.15;pointer-events:none;z-index:0;}
+.orb1{width:550px;height:550px;background:#c0006a;top:-180px;left:-180px;animation:d1 14s ease-in-out infinite alternate;}
+.orb2{width:420px;height:420px;background:#6600cc;bottom:-120px;right:-120px;animation:d2 11s ease-in-out infinite alternate;}
+.orb3{width:320px;height:320px;background:#ff2d6d;top:50%;left:50%;transform:translate(-50%,-50%);animation:p3 7s ease-in-out infinite;}
+@keyframes d1{to{transform:translate(70px,50px);}}
+@keyframes d2{to{transform:translate(-50px,-70px);}}
+@keyframes p3{0%,100%{opacity:.08;transform:translate(-50%,-50%) scale(1);}50%{opacity:.2;transform:translate(-50%,-50%) scale(1.5);}}
+
+/* ── Stars ── */
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.08;}50%{opacity:.9;}}
+
+/* ── Scene / Card ── */
+.scene{position:relative;z-index:10;padding:40px 20px 10px;display:flex;justify-content:center;}
+
+.card{
+  background:linear-gradient(160deg,rgba(28,4,22,.97) 0%,rgba(12,1,16,.99) 100%);
+  border-radius:26px;
+  padding:50px 40px 44px;
+  max-width:420px;
+  width:100%;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(55px) scale(.93);
+  animation:cardIn 1s cubic-bezier(.16,1,.3,1) .4s forwards;
+  box-shadow:
+    0 0 0 1px rgba(255,60,120,.18),
+    0 0 50px rgba(255,20,80,.18),
+    0 0 100px rgba(200,0,100,.1),
+    inset 0 1px 0 rgba(255,160,200,.07);
+}
+@keyframes cardIn{to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* radial inner glow */
+.card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% -10%,rgba(255,60,120,.09) 0%,transparent 60%);
+  pointer-events:none;border-radius:inherit;
+}
+
+/* animated spinning border */
+.spin-border{
+  position:absolute;inset:0;border-radius:26px;
+  background:conic-gradient(from var(--a,0deg),
+    transparent 60%,
+    rgba(255,60,120,.8) 75%,
+    rgba(255,200,220,1) 82%,
+    rgba(255,60,120,.8) 88%,
+    transparent 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  padding:1.5px;
+  animation:spinBorder 3.5s linear infinite;
+  pointer-events:none;
+}
+@property --a{syntax:'<angle>';initial-value:0deg;inherits:false;}
+@keyframes spinBorder{to{--a:360deg;}}
+
+/* ── Heart ── */
+.heart-wrap{
+  margin-bottom:18px;opacity:0;
+  animation:popIn .65s cubic-bezier(.34,1.56,.64,1) .9s forwards;
+}
+@keyframes popIn{from{opacity:0;transform:scale(0) rotate(-20deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+
+.heart{
+  font-size:64px;display:inline-block;
+  filter:drop-shadow(0 0 24px rgba(255,20,80,.95)) drop-shadow(0 0 50px rgba(255,0,80,.4));
+  animation:hb 1.5s ease-in-out infinite;
+}
+@keyframes hb{0%,100%{transform:scale(1);}14%{transform:scale(1.32);}28%{transform:scale(1.06);}42%{transform:scale(1.2);}56%{transform:scale(1);}}
+
+/* ── Title ── */
+.title{
+  font-family:'Great Vibes',cursive;
+  font-size:clamp(2.1rem,7.5vw,3rem);
+  font-weight:400;line-height:1.2;
+  margin-bottom:6px;opacity:0;
+  background:linear-gradient(120deg,#ff6fa3 0%,#ff1a5e 35%,#ffaac8 65%,#ff1a5e 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fs .8s ease 1.1s forwards, shine 3s linear 2s infinite;
+}
+@keyframes shine{to{background-position:200% center;}}
+
+/* ── Date ── */
+.date{
+  display:inline-block;font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,140,180,.55);margin-bottom:28px;opacity:0;
+  animation:fs .7s ease 1.3s forwards;
+}
+
+/* ── Divider ── */
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:24px;opacity:0;animation:fs .7s ease 1.45s forwards;}
+.dl{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,60,120,.35),transparent);}
+.di{font-size:14px;}
+
+/* ── Body ── */
+.bt{
+  color:rgba(255,210,225,.7);font-size:1.05rem;line-height:1.92;
+  font-weight:300;margin-bottom:16px;opacity:0;
+}
+.bt:nth-of-type(1){animation:fs .7s ease 1.6s forwards;}
+.bt:nth-of-type(2){animation:fs .7s ease 1.82s forwards;}
+
+/* ── Footer ── */
+.footer{
+  margin-top:28px;font-family:'Great Vibes',cursive;font-size:1.65rem;
+  color:#ff5f96;opacity:0;
+  text-shadow:0 0 22px rgba(255,60,130,.65);
+  animation:fs .7s ease 2.05s forwards;
+}
+.emojis{display:inline-block;animation:bob 2.6s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg);}50%{transform:translateY(-7px) rotate(6deg);}}
+
+@keyframes fs{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Photo gallery ── */
+.gallery-wrap{
+  position:relative;z-index:10;
+  width:100%;max-width:420px;
+  margin:22px auto 0;
+  padding:0 20px 60px;
+}
+.gallery-title{
+  text-align:center;
+  font-family:'Great Vibes',cursive;
+  font-size:1.5rem;
+  color:rgba(255,120,170,.7);
+  margin-bottom:14px;
+  letter-spacing:.05em;
+}
+.gallery{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.photo-frame{
+  border-radius:14px;
+  overflow:hidden;
+  border:1.5px solid rgba(255,60,120,.3);
+  box-shadow:0 0 20px rgba(255,20,80,.2),0 4px 20px rgba(0,0,0,.5);
+  aspect-ratio:3/4;
+  opacity:0;
+  transform:translateY(30px) scale(.95);
+  transition:transform .3s ease,box-shadow .3s ease;
+  cursor:pointer;
+}
+.photo-frame:hover{
+  transform:scale(1.04);
+  box-shadow:0 0 30px rgba(255,40,100,.4),0 8px 30px rgba(0,0,0,.6);
+}
+.photo-frame img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+.photo-frame:nth-child(1){animation:photoIn .6s ease .2s forwards;}
+.photo-frame:nth-child(2){animation:photoIn .6s ease .4s forwards;}
+.photo-frame:nth-child(3){animation:photoIn .6s ease .6s forwards;}
+.photo-frame:nth-child(4){animation:photoIn .6s ease .8s forwards;}
+@keyframes photoIn{to{opacity:1;transform:translateY(0) scale(1);}}
+
+/* Lightbox */
+.lightbox{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.92);
+  z-index:9999;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.lightbox.active{display:flex;}
+.lightbox img{
+  max-width:92vw;max-height:88vh;
+  border-radius:16px;
+  border:1.5px solid rgba(255,60,120,.4);
+  box-shadow:0 0 60px rgba(255,20,80,.3);
+  animation:lbIn .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes lbIn{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+.lightbox-close{
+  position:absolute;top:20px;right:24px;
+  color:rgba(255,150,180,.8);font-size:2rem;
+  cursor:pointer;line-height:1;
+  transition:color .2s;
+}
+.lightbox-close:hover{color:#fff;}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div class="stars" id="stars"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div id="fallers"></div>
+
+<div class="scene">
+  <div class="card">
+    <div class="spin-border"></div>
+
+    <div class="heart-wrap"><span class="heart">❤️</span></div>
+
+    <h1 class="title">Happy Birthday,<br>My Love!</h1>
+    <span class="date">April 19, 2026</span>
+
+    <div class="divider">
+      <div class="dl"></div>
+      <span class="di">💗</span>
+      <div class="dl"></div>
+    </div>
+
+    <p class="bt">
+      You are my happiness every day. I'm so lucky to have you.
+      Thank you for loving me and caring for me.
+    </p>
+    <p class="bt">
+      On your special day, I just want you to know how much you
+      mean to me. I love you more than words can say.
+      You are my heart and my everything!
+    </p>
+
+    <div class="footer">
+      I love you so much, beb <span class="emojis">🥰💕</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── Stars ─── */
+const starsEl=document.getElementById('stars');
+for(let i=0;i<90;i++){
+  const s=document.createElement('div');s.className='star';
+  const z=.5+Math.random()*2.2;
+  s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${1.8+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+  starsEl.appendChild(s);
+}
+
+/* ─── Falling items ─── */
+const items=['🎁','🎀','💝','🎊','🎉','💖','🌹','✨','🎈','💕','🎁','🎀','💝','🎊'];
+const fallersEl=document.getElementById('fallers');
+for(let i=0;i<24;i++){
+  const f=document.createElement('div');f.className='faller';
+  f.textContent=items[i%items.length];
+  const dur=4.5+Math.random()*7;
+  f.style.cssText=`left:${Math.random()*100}%;font-size:${18+Math.random()*24}px;animation-duration:${dur}s;animation-delay:${Math.random()*9}s;`;
+  fallersEl.appendChild(f);
+}
+
+/* ─── Canvas ─── */
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+/* confetti */
+const CONF=[];
+const CC=['#ff2d6d','#ff6fa3','#ffb3c8','#9b30ff','#ff9f43','#fff','#ff1a5e','#c060ff'];
+class Conf{
+  constructor(){this.reset(true);}
+  reset(ini){
+    this.x=Math.random()*canvas.width;
+    this.y=ini?Math.random()*canvas.height:-20;
+    this.w=5+Math.random()*10;this.h=3+Math.random()*5;
+    this.color=CC[Math.floor(Math.random()*CC.length)];
+    this.sp=.3+Math.random()*1.1;
+    this.ang=Math.random()*Math.PI*2;
+    this.rs=(Math.random()-.5)*.09;
+    this.dr=(Math.random()-.5)*.5;
+    this.op=.35+Math.random()*.65;
+  }
+  update(){
+    this.y+=this.sp;this.x+=this.dr;this.ang+=this.rs;
+    if(this.y>canvas.height+20)this.reset(false);
+  }
+  draw(){
+    ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.ang);
+    ctx.globalAlpha=this.op;ctx.fillStyle=this.color;
+    ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h);
+    ctx.restore();
+  }
+}
+for(let i=0;i<100;i++)CONF.push(new Conf());
+
+/* firework particles */
+const PARTS=[];
+class Part{
+  constructor(x,y,color){
+    this.x=x;this.y=y;
+    const a=Math.random()*Math.PI*2,sp=1.5+Math.random()*4.5;
+    this.vx=Math.cos(a)*sp;this.vy=Math.sin(a)*sp;
+    this.alpha=1;this.color=color;
+    this.r=1.5+Math.random()*2.5;
+    this.grav=.055;this.decay=.011+Math.random()*.013;
+    this.tail=[];
+  }
+  update(){
+    this.tail.push({x:this.x,y:this.y,a:this.alpha});
+    if(this.tail.length>9)this.tail.shift();
+    this.vy+=this.grav;this.x+=this.vx;this.y+=this.vy;
+    this.alpha-=this.decay;
+  }
+  draw(){
+    this.tail.forEach((t,i)=>{
+      ctx.beginPath();
+      ctx.arc(t.x,t.y,this.r*(i/this.tail.length)*.55,0,Math.PI*2);
+      ctx.fillStyle=this.color;ctx.globalAlpha=t.a*(i/this.tail.length)*.35;ctx.fill();
+    });
+    ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=this.color;ctx.globalAlpha=this.alpha;ctx.fill();
+  }
+  dead(){return this.alpha<=0;}
+}
+
+const PALS=[
+  ['#ff2d6d','#ff6fa3','#ffb3c8','#fff'],
+  ['#c060ff','#ff2d6d','#ffb3c8','#fff'],
+  ['#ff9f43','#ff6fa3','#fff','#ff1a5e'],
+  ['#ff1a5e','#ffb3c8','#c060ff','#fff'],
+];
+
+function burst(x,y){
+  const pal=PALS[Math.floor(Math.random()*PALS.length)];
+  const n=45+Math.floor(Math.random()*25);
+  for(let i=0;i<n;i++) PARTS.push(new Part(x,y,pal[Math.floor(Math.random()*pal.length)]));
+}
+
+let lastB=0;
+function autoFirework(ts){
+  if(ts-lastB>1600+Math.random()*1400){
+    burst(canvas.width*(.15+Math.random()*.7),canvas.height*(.08+Math.random()*.5));
+    lastB=ts;
+  }
+}
+
+function loop(ts){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  CONF.forEach(c=>{c.update();c.draw();});
+  autoFirework(ts);
+  for(let i=PARTS.length-1;i>=0;i--){
+    PARTS[i].update();PARTS[i].draw();
+    if(PARTS[i].dead())PARTS.splice(i,1);
+  }
+  ctx.globalAlpha=1;
+  requestAnimationFrame(loop);
+}
+
+setTimeout(()=>{
+  burst(canvas.width*.25,canvas.height*.22);
+  setTimeout(()=>burst(canvas.width*.72,canvas.height*.18),400);
+  setTimeout(()=>burst(canvas.width*.5,canvas.height*.3),800);
+},1000);
+
+requestAnimationFrame(loop);
+</script>
+
+
+<!-- ═══════════════════════════════
+     PHOTO GALLERY
+     👉 ប្តូរ src="photo1.jpg" ជារូបភាពរបស់អ្នក
+        ឬ upload រូបភាពចូល folder តែមួយ
+═══════════════════════════════ -->
+<div class="gallery-wrap">
+  <div class="gallery-title">Our Memories 💕</div>
+  <div class="gallery">
+
+    <!-- រូបទី 1 — ប្តូរ src ឲ្យត្រូវ -->
+    <div class="photo-frame" onclick="openLightbox(this.querySelector('img').src)">
+      <img src="photo1.jpg" alt="memory 1" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <!-- រូបទី 2 -->
+    <div class="photo-frame" onclick="openLightbox(this.querySelector('img').src)">
+      <img src="photo2.jpg" alt="memory 2" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <!-- រូបទី 3 -->
+    <div class="photo-frame" onclick="openLightbox(this.querySelector('img').src)">
+      <img src="photo3.jpg" alt="memory 3" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <!-- រូបទី 4 -->
+    <div class="photo-frame" onclick="openLightbox(this.querySelector('img').src)">
+      <img src="photo4.jpg" alt="memory 4" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close" onclick="closeLightbox()">✕</span>
+  <img id="lb-img" src="" alt=""/>
+</div>
+
+<script>
+function openLightbox(src){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('active');
+  document.getElementById('lb-img').src='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+</script>
+
+</body>
+</html>
